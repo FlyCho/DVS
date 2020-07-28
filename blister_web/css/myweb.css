@@ -1,0 +1,7 @@
+.border-dotted{
+ border-style: dotted;
+}
+.border-size{
+border-style:solid;
+ border-width: 3px;
+}

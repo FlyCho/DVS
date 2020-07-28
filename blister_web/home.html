@@ -1,0 +1,210 @@
+<!doctype html>
+<html>
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!--   jquery   -->
+    <script src="js/jquery-3.3.1.slim.min.js"></script>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="css/bootstrapCSS/bootstrap.min.css">
+    <link rel="stylesheet" href="css/Footer-with-social-icons.css">
+    <link rel="stylesheet" href="css/myweb.css">
+
+    <title>藥排核實系統</title>
+  </head>
+  <body style="font-family:Microsoft JhengHei;">
+  <div id="navbar" style="margin-bottom: 80px">
+    <nav class="p-3 navbar navbar-expand-lg beta-menu navbar-dropdown align-items-center fixed-top navbar-toggleable-sm navbar-dark bg-dark" style="margin-bottom: 200px">
+        <a class="navbar-brand" style="font-weight:bold" href="#">藥排核實系統</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarColor01">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+              <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+            </li>
+          </ul>
+          <form class="form-inline">
+            <button class="btn btn-outline-info my-2 my-sm-0 mr-sm-2" type="submit">上一筆</button>
+            <button class="btn btn-outline-info my-2 my-sm-0" type="submit">下一筆</button>
+          </form>
+        </div>
+      </nav>
+    </div>
+
+    <!-- main content -->
+      <div class="container">
+        <div class="row">
+            <div class="col-md-12 rounded border-size border-dark" style="margin-bottom:20px; height:4rem; width:500px">
+                <div class="row">
+                    <div class="col-md-3">
+                        <h4 id="name" style="margin-top:15px">病患姓名 :</h4>
+                    </div>
+                    <div class="col-md-3">
+                        <h4 id="subject" style="margin-top:15px">科別代碼 :</h4>
+                    </div>
+                    <div class="col-md-3">
+                        <h4 id="doctor" style="margin-top:15px">醫師姓名 :</h4>
+                    </div>
+                    <div class="col-md-3">
+                        <h4 id="date" style="margin-top:15px">看診日期 :</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row ">
+            <div class="col-md-12 rounded border-size border-dark" style="height:400px;">
+                <table class="table mt-5 border border-dark">
+                  <thead class="table-dark">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">藥品代碼</th>
+                        <th scope="col">藥品名稱</th>
+                        <th scope="col">藥品數量</th>
+                        <th scope="col">檢測結果</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tablebody">
+
+                  </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 rounded pb-5 border-size border-dark w-100 mt-4" style="margin-bottom:20px; height:75px">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h4 style="margin-top:15px">藥師姓名 : 顏O慧 [台北]</h4>
+                    </div>
+                    <div class="col-md-4">
+                        <h4 id="ticketID" style="margin-top:15px">藥單編號 : </h4>
+                    </div>
+                    <div class="col-md-4">
+                        <h4 style="margin-top:15px">調配時間 : 20191103</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+
+    <!-- footer -->
+    <footer id="myFooter" >
+        <div class="footer-copyright">
+            <p>© 2019 Copyright</p>
+        </div>
+    </footer>
+
+    <script type="text/javascript">
+        var name = $('#name');
+        var subject = $('#subject');
+        var doctor = $('#doctor');
+        var date = $('#date');
+        var blister_name="";
+
+        if ("WebSocket" in window){
+            console.log("您的瀏覽器支援 WebSocket!");
+            var ws = new WebSocket("ws://127.0.0.1:9001");
+            var blister_ws = new WebSocket("ws://127.0.0.1:9002");
+            //var ws = new WebSocket("ws://localhost:9001");
+            ws.onopen = function(){
+                console.log("QRcode websocket 已連線上");
+            }
+            blister_ws.onopen = function(){
+                console.log("blister websocket 已連線上");
+            }
+
+
+            ws.onmessage = function (evt) {
+                var dataReceive = evt.data;
+                var obj = JSON.parse(dataReceive);
+
+                if(obj.type == "barcode"){
+                    $('#name').text("病患姓名: " + obj.name);
+                    $('#subject').text("科別代碼: " + obj.subject);
+                    $('#doctor').text("醫師姓名: " + obj.doctor);
+                    $('#date').text("看診日期: " + obj.date);
+
+                    if(("藥單編號: "+obj.bagid) != $('#ticketID').text()){
+                        showSound("/home/ee303/Desktop/Barcode_new (64)/blister_web/audio/beep.mp3");
+                        console.log("sound")
+                        $('#tablebody').html("");
+                        for(var i=1 ; i<=Object.keys(obj.blister).length ; i++){
+                            console.log(obj.blister[i]);
+                            let checkTag = $("<tr id='"+ obj.blister[i]["id"] + "'><th scope='row'>"+ i +"</th><td>" + obj.blister[i]["id"] + "</td><td>" + obj.blister[i]["name"] + "</td><td>" + obj.blister[i]["sum"] + "</td></tr>");
+                            checkTag.appendTo("#tablebody");
+                        }
+                    }
+                    $('#ticketID').text("藥單編號: " + obj.bagid);
+                }
+                else if(obj.type == "check"){
+                    console.log(obj);
+                }
+
+
+            };
+
+            blister_ws.onmessage = function (evt) {
+                var blister = evt.data;
+                var object = JSON.parse(blister);
+
+                if(object.type == "check" && document.getElementById(object.id+"")){
+                    let checkTag = $("<td><img src='photo/yes.png'  width='30' height='30'></td>");
+                    checkTag.appendTo("#" + object.id);
+                }
+            };
+
+
+            ws.onclose = function() {
+                console.log("QRcode websocket 連線已關閉...");
+            };
+
+            blister_ws.onclose = function() {
+                console.log("blister websocket 連線已關閉...");
+            };
+
+        }else{
+            // 瀏覽器不支援 WebSocket
+            console.log("您的瀏覽器不支援 WebSocket!");
+        }
+
+        function sendMessage(){
+            var dataSend = oWin.val().trim();
+            ws.send(dataSend);
+            oWin.val('');
+        }
+
+
+        function showSound(audio){
+            $("#audio").remove();
+            let audioTag = $("<audio src='" + audio + "' autoplay id='audio' />");
+            audioTag.appendTo("body");
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        async function webreload(){
+            await sleep(3000);
+            blister_ws.send("no blister");
+            location.reload();
+        }
+
+        async function checkreload(){
+            await sleep(3000);
+            $("#check").remove();
+            let checkTag = $("<img id='check' src='photo/white.jpg'  width='300' height='300'>");
+            checkTag.appendTo("#photodiv");
+
+        }
+
+    </script>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="js/popper.min.js"></script>
+    <script src="js/bootstrapJS/bootstrap.min.js"></script>
+  </body>
+</html>

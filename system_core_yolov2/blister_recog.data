@@ -1,0 +1,6 @@
+classes= 230
+train  = /ee303/Yolo_v3/train_file_list/blister_back_synth100k_training_set.txt
+valid  = /ee303/Yolo_v3/test_file_list/blister_back_synth100k_testing_set.txt
+names = /media/ee303/60C087CBC087A5BE/UI_mode/system_core_yolov2/blister_recog.names
+backup = backup
+
