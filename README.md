@@ -1,7 +1,8 @@
 # DVS
 Dispensation Verification System
 ### Examples
-![image_1](Dispensation Verification System (DVS).png)
+![image_1](DVS.png)
+
 ### Demo
 + [Demo](https://youtu.be/J1P_9GbXVAo)
 ### Introduction
