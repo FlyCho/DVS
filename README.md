@@ -1,6 +1,6 @@
 # DVS
 Dispensation Verification System
-### Examples
+### System Architecture
 ![image_1](DVS.png)
 
 ### Demo
